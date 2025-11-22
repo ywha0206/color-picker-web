@@ -1,0 +1,25 @@
+.App {
+  font-family: 'Pretendard', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #222;
+  transition: background-color 0.3s ease;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    padding: 5px;
+  }
+}

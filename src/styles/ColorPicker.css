@@ -1,0 +1,76 @@
+.color-picker-container {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  padding: 10px;
+  width: 500px;
+  max-width: 100%;
+}
+
+.color-picker-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: left;
+  color: #333;
+  font-weight: 600;
+}
+
+.palette-area {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  position: relative;
+  justify-content: center;
+}
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.slider-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .color-picker-container {
+    width: 90%;
+    padding: 8px;
+  }
+  
+  .palette-area {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .color-picker-title {
+    text-align: center;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .color-picker-container {
+    width: 95%;
+    padding: 5px;
+  }
+  
+  .color-picker-title {
+    font-size: 16px;
+  }
+}
