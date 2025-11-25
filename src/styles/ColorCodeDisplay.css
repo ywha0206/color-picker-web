@@ -98,3 +98,21 @@
   border-color: #007bff;
   box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.25);
 }
+
+.copy-button {
+    background: none;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 2px 5px;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1; /* 아이콘 중앙 정렬을 위해 */
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    flex-shrink: 0; /* 공간이 부족해도 축소되지 않도록 */
+}
+
+.copy-button:hover {
+    background-color: #eee;
+}

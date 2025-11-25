@@ -4,12 +4,16 @@ import './styles/App.css';
 
 function App() {
   const [backgroundColor, setBackgroundColor] = useState('#00FF40');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
-  // 배경색 변경 함수
   const updateBackgroundColor = (color) => {
     setBackgroundColor(color);
   };
-
+  
   return (
     <div className="App" style={{ backgroundColor }}>
       <ColorPicker onColorChange={updateBackgroundColor} />
