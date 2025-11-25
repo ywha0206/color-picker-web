@@ -6,31 +6,64 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
 
     // 1. HEX 입력용 임시 상태
     const [tempHex, setTempHex] = useState(hex);
+    const [isHandlingBlur, setIsHandlingBlur] = useState(false);
     
     // 2. 모든 숫자 입력 필드를 위한 임시 상태 (입력 중인 값을 문자열로 보존)
     const [tempValues, setTempValues] = useState({
         rgb: { r: rgb.r.toString(), g: rgb.g.toString(), b: rgb.b.toString() },
-        cmyk: rgbToCmyk(rgb.r, rgb.g, rgb.b),
-        hsv: rgbToHsv(rgb.r, rgb.g, rgb.b),
-        hsl: rgbToHsl(rgb.r, rgb.g, rgb.b),
+        cmyk: { 
+            c: Math.round(rgbToCmyk(rgb.r, rgb.g, rgb.b).c).toString(),
+            m: Math.round(rgbToCmyk(rgb.r, rgb.g, rgb.b).m).toString(),
+            y: Math.round(rgbToCmyk(rgb.r, rgb.g, rgb.b).y).toString(),
+            k: Math.round(rgbToCmyk(rgb.r, rgb.g, rgb.b).k).toString(),
+        },
+        hsv: { 
+            h: Math.round(rgbToHsv(rgb.r, rgb.g, rgb.b).h).toString(),
+            s: Math.round(rgbToHsv(rgb.r, rgb.g, rgb.b).s).toString(),
+            v: Math.round(rgbToHsv(rgb.r, rgb.g, rgb.b).v).toString(),
+        },
+        hsl: { 
+            h: Math.round(rgbToHsl(rgb.r, rgb.g, rgb.b).h).toString(),
+            s: Math.round(rgbToHsl(rgb.r, rgb.g, rgb.b).s).toString(),
+            l: Math.round(rgbToHsl(rgb.r, rgb.g, rgb.b).l).toString(),
+        },
     });
 
     // 3. prop 기반 실시간 계산 (현재의 "진실된" 색상 코드)
-    const currentCmyk = rgbToCmyk(rgb.r, rgb.g, rgb.b);
-    const currentHsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
-    const currentHsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const currentCmykFloat = rgbToCmyk(rgb.r, rgb.g, rgb.b);
+    const currentHsvFloat = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    const currentHslFloat = rgbToHsl(rgb.r, rgb.g, rgb.b);
 
     // 4. 외부 색상 변경 시, 모든 임시 상태 초기화 및 HEX 동기화
     useEffect(() => {
+        if (isHandlingBlur) { return; }
+
         setTempHex(hex);
-        // 새로운 prop 값으로 모든 tempValues 초기화
+        
         setTempValues({
             rgb: { r: rgb.r.toString(), g: rgb.g.toString(), b: rgb.b.toString() },
-            cmyk: currentCmyk,
-            hsv: currentHsv,
-            hsl: currentHsl,
+            cmyk: {
+                c: Math.round(currentCmykFloat.c).toString(),
+                m: Math.round(currentCmykFloat.m).toString(),
+                y: Math.round(currentCmykFloat.y).toString(),
+                k: Math.round(currentCmykFloat.k).toString(),
+            },
+            hsv: {
+                h: Math.round(currentHsvFloat.h).toString(),
+                s: Math.round(currentHsvFloat.s).toString(),
+                v: Math.round(currentHsvFloat.v).toString(),
+            },
+            hsl: {
+                h: Math.round(currentHslFloat.h).toString(),
+                s: Math.round(currentHslFloat.s).toString(),
+                l: Math.round(currentHslFloat.l).toString(),
+            },
         });
-    }, [rgb, hex]); 
+    }, [rgb, hex, isHandlingBlur,
+        currentCmykFloat.c, currentCmykFloat.m, currentCmykFloat.y, currentCmykFloat.k,
+        currentHsvFloat.h, currentHsvFloat.s, currentHsvFloat.v,
+        currentHslFloat.h, currentHslFloat.s, currentHslFloat.l
+    ]); 
 
     // 5. 공통된 onChange 핸들러: 입력 중에는 로컬 상태만 문자열로 업데이트
     const handleChange = (model, component, value) => {
@@ -38,14 +71,15 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
             ...prev,
             [model]: {
                 ...prev[model],
-                [component]: value // 문자열 그대로 저장
+                [component]: value
             }
         }));
     };
 
     // 6. RGB Blur 핸들러: 포커스 해제 시에만 부모 업데이트
     const handleRgbBlur = () => {
-        // tempValues에 있는 모든 RGB 값을 파싱하여 최종 RGB 객체 생성
+        setIsHandlingBlur(true);
+
         const finalRgb = { 
             r: parseInt(tempValues.rgb.r, 10) || 0,
             g: parseInt(tempValues.rgb.g, 10) || 0,
@@ -65,11 +99,16 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
         
         // 부모에게 최종 RGB만 전달
         onColorChange(clampedRgb);
+
+        setTimeout(() => {
+            setIsHandlingBlur(false);
+        }, 0);
     };
 
     // 7. CMYK Blur 핸들러
     const handleCmykBlur = () => {
-        // tempValues에 있는 모든 CMYK 값을 파싱
+        setIsHandlingBlur(true);
+
         const { c, m, y, k } = tempValues.cmyk;
         const intC = parseInt(c, 10) || 0;
         const intM = parseInt(m, 10) || 0;
@@ -91,10 +130,16 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
         }));
 
         onColorChange(newRgb);
+
+        setTimeout(() => {
+            setIsHandlingBlur(false);
+        }, 0);
     };
     
     // 8. HSV Blur 핸들러 
     const handleHsvBlur = () => {
+        setIsHandlingBlur(true);
+
         const { h, s, v } = tempValues.hsv;
         const intH = parseInt(h, 10) || 0;
         const intS = parseInt(s, 10) || 0;
@@ -114,10 +159,16 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
         }));
 
         onColorChange(newRgb);
+
+        setTimeout(() => {
+            setIsHandlingBlur(false);
+        }, 0);
     };
 
     // 9. HSL Blur 핸들러
     const handleHslBlur = () => {
+        setIsHandlingBlur(true);
+        
         const { h, s, l } = tempValues.hsl;
         const intH = parseInt(h, 10) || 0;
         const intS = parseInt(s, 10) || 0;
@@ -137,6 +188,10 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
         }));
 
         onColorChange(newRgb);
+
+        setTimeout(() => {
+            setIsHandlingBlur(false);
+        }, 0);
     };
 
     // 10. HEX Change 핸들러
@@ -146,6 +201,28 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
             const newRgb = hexToRgb(value);
             onColorChange(newRgb);
         }
+    };
+
+    const handleCopy = (value, format) => {
+        let textToCopy = value;
+        if (format === 'rgb') {
+            textToCopy = `${tempValues.rgb.r}, ${tempValues.rgb.g}, ${tempValues.rgb.b}`;
+        } else if (format === 'cmyk') {
+            textToCopy = `${tempValues.cmyk.c}, ${tempValues.cmyk.m}, ${tempValues.cmyk.y}, ${tempValues.cmyk.k}`;
+        } else if (format === 'hsv') {
+            textToCopy = `${tempValues.hsv.h}, ${tempValues.hsv.s}, ${tempValues.hsv.v}`;
+        } else if (format === 'hsl') {
+            textToCopy = `${tempValues.hsl.h}, ${tempValues.hsl.s}, ${tempValues.hsl.l}`;
+        }
+        
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                alert(`${textToCopy}가 클립보드에 복사되었습니다.`);
+            })
+            .catch(err => {
+                console.error('클립보드 복사 실패:', err);
+                alert('클립보드 복사 실패. 콘솔을 확인하세요.');
+            });
     };
 
     return (
@@ -158,6 +235,9 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
                     className="hex-input"
                     placeholder="#000000"
                 />
+                <button onClick={() => handleCopy(tempHex, 'hex')} className="copy-button">
+                    Copy
+                </button>
             </div>
             
             <div className="color-input-group">
@@ -185,6 +265,9 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
                         onBlur={handleRgbBlur} 
                         className="color-input" 
                     />
+                    <button onClick={() => handleCopy(tempHex, 'rgb')} className="copy-button">
+                        📋
+                    </button>
                 </div>
                 
                 {/* CMYK Input */}
@@ -195,6 +278,9 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
                     <input type="number" min="0" max="100" value={tempValues.cmyk.m} onChange={(e) => handleChange('cmyk', 'm', e.target.value)} onBlur={handleCmykBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.cmyk.y} onChange={(e) => handleChange('cmyk', 'y', e.target.value)} onBlur={handleCmykBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.cmyk.k} onChange={(e) => handleChange('cmyk', 'k', e.target.value)} onBlur={handleCmykBlur} className="color-input" />
+                    <button onClick={() => handleCopy(tempHex, 'cmyk')} className="copy-button">
+                        📋
+                    </button>
                 </div>
                 
                 {/* HSV Input */}
@@ -204,6 +290,9 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
                     <input type="number" min="0" max="360" value={tempValues.hsv.h} onChange={(e) => handleChange('hsv', 'h', e.target.value)} onBlur={handleHsvBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.hsv.s} onChange={(e) => handleChange('hsv', 's', e.target.value)} onBlur={handleHsvBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.hsv.v} onChange={(e) => handleChange('hsv', 'v', e.target.value)} onBlur={handleHsvBlur} className="color-input" />
+                    <button onClick={() => handleCopy(tempHex, 'hsv')} className="copy-button">
+                        📋
+                    </button>
                 </div>
                 
                 {/* HSL Input */}
@@ -213,6 +302,9 @@ const ColorCodeDisplay = ({ rgb, hex, onColorChange }) => {
                     <input type="number" min="0" max="360" value={tempValues.hsl.h} onChange={(e) => handleChange('hsl', 'h', e.target.value)} onBlur={handleHslBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.hsl.s} onChange={(e) => handleChange('hsl', 's', e.target.value)} onBlur={handleHslBlur} className="color-input" />
                     <input type="number" min="0" max="100" value={tempValues.hsl.l} onChange={(e) => handleChange('hsl', 'l', e.target.value)} onBlur={handleHslBlur} className="color-input" />
+                    <button onClick={() => handleCopy(tempHex, 'hsl')} className="copy-button">
+                        📋
+                    </button>
                 </div>
             </div>
         </div>

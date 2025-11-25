@@ -47,11 +47,11 @@ export const rgbToCmyk = (r, g, b) => {
   y = (y - k) / (1 - k);
   
   return {
-    c: Math.round(c * 100),
-    m: Math.round(m * 100),
-    y: Math.round(y * 100),
-    k: Math.round(k * 100)
-  };
+        c: c * 100,
+        m: m * 100,
+        y: y * 100,
+        k: k * 100
+    };
 };
 
 /**
@@ -78,9 +78,9 @@ export const rgbToHsv = (r, g, b) => {
   }
   
   return { 
-    h: Math.round(h * 360), 
-    s: Math.round(s * 100), 
-    v: Math.round(v * 100) 
+    h: h * 360, 
+    s: s * 100, 
+    v: v * 100 
   };
 };
 
@@ -109,9 +109,9 @@ export const rgbToHsl = (r, g, b) => {
   }
   
   return { 
-    h: Math.round(h * 360), 
-    s: Math.round(s * 100), 
-    l: Math.round(l * 100) 
+    h: h * 360,
+    s: s * 100, 
+    l: l * 100 
   };
 };
 
