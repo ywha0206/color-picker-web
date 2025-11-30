@@ -11,6 +11,46 @@
   box-sizing: border-box;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  height: 45px;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.menu-icon {
+  background-color: white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  &:hover {
+    background-color: #eee;
+  }
+}
+
+.toggle-bg {
+  background-color: black;
+  opacity: 0.5;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.toggle {
+  background-color: white;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 250px;
+  height: 100%;
+}
+
+/* .menu-icon:hover {
+  background-color: skyblue;
+} */
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .App {
